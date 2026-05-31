@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Home — TrustLed Aula{% endblock %}
+{% block content %}
+<div class="mb-6">
+  <h1 class="text-2xl font-bold text-navy">Welcome, {{ current_user.full_name.split()[0] }}</h1>
+  <p class="text-slate-500 text-sm mt-1">
+    Every tool here runs through your institution's sanctioned, governed AI environment.
+  </p>
+</div>
+
+{% macro card(title, desc, href, tag=None) %}
+<a href="{{ href }}" class="block bg-white border border-slate-200 rounded-xl p-5 hover:border-teal hover:shadow-sm transition">
+  <div class="flex items-center justify-between">
+    <h3 class="font-semibold text-navy">{{ title }}</h3>
+    {% if tag %}<span class="text-xs bg-lightteal/30 text-teal px-2 py-0.5 rounded">{{ tag }}</span>{% endif %}
+  </div>
+  <p class="text-sm text-slate-500 mt-2">{{ desc }}</p>
+</a>
+{% endmacro %}
+
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  {{ card("Research Assistant", "Develop research and project ideas from your interests, with references in your house style.", url_for('main.assistant')) }}
+  {{ card("Reference Formatter", "Turn raw source details into a clean reference list in your institution's style.", url_for('main.references')) }}
+
+  {% if current_user.is_lecturer %}
+    {{ card("Lesson Planner", "Build a semester-aligned plan with objectives, timing, and activities.", url_for('lecturer.new_plan')) }}
+    {{ card("Lecture Notes", "Generate structured teaching notes you can edit and export.", url_for('lecturer.new_note')) }}
+    {{ card("My Teaching", "View your saved plans and notes.", url_for('lecturer.plans')) }}
+  {% endif %}
+
+  {% if current_user.is_student %}
+    {{ card("Research Support", "Get guidance on project topics, structure, and drafting.", url_for('student.new_research')) }}
+    {{ card("Exam Preparation", "Generate revision summaries and practice questions.", url_for('student.new_exam')) }}
+    {{ card("My Work", "View your saved research and revision material.", url_for('student.work')) }}
+  {% endif %}
+
+  {% if current_user.is_admin %}
+    {{ card("Governance Dashboard", "Usage by feature, role, and volume across the institution.", url_for('admin.dashboard')) }}
+    {{ card("Audit Log", "Every AI interaction, searchable and exportable.", url_for('admin.audit')) }}
+    {{ card("User Accounts", "Create and manage staff and student access.", url_for('admin.users')) }}
+  {% endif %}
+</div>
+{% endblock %}

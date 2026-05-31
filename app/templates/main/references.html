@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import page_header, result_block %}
+{% block title %}Reference Formatter — Aula{% endblock %}
+{% block content %}
+{{ page_header("Reference Formatter",
+   "Paste source details and get them formatted in your institution's " ~ style ~ " style.") }}
+<form method="POST" class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 max-w-2xl">
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Sources</label>
+    <textarea name="sources" rows="6" required
+              class="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-teal focus:outline-none"
+              placeholder="One source per line: authors, year, title, publisher/journal, etc.">{{ sources }}</textarea>
+  </div>
+  <button class="bg-navy hover:bg-navy/90 text-white px-5 py-2 rounded font-medium">Format references</button>
+</form>
+{{ result_block(result) }}
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import page_header %}
+{% block title %}User Accounts — Aula{% endblock %}
+{% block content %}
+{{ page_header("User Accounts", "Create and manage staff and student access.") }}
+
+<form method="POST" action="{{ url_for('admin.new_user') }}"
+      class="bg-white border border-slate-200 rounded-xl p-5 mb-6 grid sm:grid-cols-5 gap-3 items-end">
+  <div>
+    <label class="block text-xs font-medium text-slate-600 mb-1">Full name</label>
+    <input name="full_name" required class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm">
+  </div>
+  <div>
+    <label class="block text-xs font-medium text-slate-600 mb-1">Email</label>
+    <input name="email" type="email" required class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm">
+  </div>
+  <div>
+    <label class="block text-xs font-medium text-slate-600 mb-1">Role</label>
+    <select name="role" class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm">
+      {% for r in roles %}<option value="{{ r }}" class="capitalize">{{ r }}</option>{% endfor %}
+    </select>
+  </div>
+  <div>
+    <label class="block text-xs font-medium text-slate-600 mb-1">Temp password</label>
+    <input name="password" required class="w-full border border-slate-300 rounded px-2 py-1.5 text-sm">
+  </div>
+  <button class="bg-navy text-white px-4 py-2 rounded text-sm">Create</button>
+</form>
+
+<div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+      <tr><th class="text-left px-4 py-2">Name</th><th class="text-left px-4 py-2">Email</th>
+      <th class="text-left px-4 py-2">Role</th><th class="text-left px-4 py-2">Status</th>
+      <th class="text-right px-4 py-2">Action</th></tr>
+    </thead>
+    <tbody>
+    {% for u in users %}
+      <tr class="border-t border-slate-100">
+        <td class="px-4 py-2">{{ u.full_name }}</td>
+        <td class="px-4 py-2 text-slate-500">{{ u.email }}</td>
+        <td class="px-4 py-2 capitalize">{{ u.role }}</td>
+        <td class="px-4 py-2">
+          {% if u.is_active_user %}<span class="text-green-600">Active</span>
+          {% else %}<span class="text-slate-400">Inactive</span>{% endif %}
+        </td>
+        <td class="px-4 py-2 text-right">
+          {% if u.id != current_user.id %}
+          <form method="POST" action="{{ url_for('admin.toggle_user', user_id=u.id) }}" class="inline">
+            <button class="text-xs text-teal hover:underline">
+              {{ 'Deactivate' if u.is_active_user else 'Activate' }}</button>
+          </form>
+          {% else %}<span class="text-xs text-slate-300">you</span>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

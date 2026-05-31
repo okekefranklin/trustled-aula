@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}TrustLed Aula{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: {
+        navy: '#0B2447', teal: '#1B9AAA', lightteal: '#8FD6D8'
+      }}}
+    }
+  </script>
+  <style>
+    body { font-family: ui-sans-serif, system-ui, -apple-system, Arial, sans-serif; }
+    .prose-out { white-space: pre-wrap; line-height: 1.6; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+{% if current_user.is_authenticated %}
+<header class="bg-navy text-white">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="{{ url_for('main.dashboard') }}" class="flex items-center gap-2">
+      <span class="text-xl font-bold">TrustLed <span class="text-lightteal">Aula</span></span>
+    </a>
+    <nav class="flex items-center gap-4 text-sm">
+      <a href="{{ url_for('main.dashboard') }}" class="hover:text-lightteal">Home</a>
+      <a href="{{ url_for('main.assistant') }}" class="hover:text-lightteal">Research Assistant</a>
+      <a href="{{ url_for('main.references') }}" class="hover:text-lightteal">References</a>
+      {% if current_user.is_lecturer %}
+        <a href="{{ url_for('lecturer.plans') }}" class="hover:text-lightteal">My Teaching</a>
+      {% endif %}
+      {% if current_user.is_student %}
+        <a href="{{ url_for('student.work') }}" class="hover:text-lightteal">My Work</a>
+      {% endif %}
+      {% if current_user.is_admin %}
+        <a href="{{ url_for('admin.dashboard') }}" class="hover:text-lightteal">Admin</a>
+      {% endif %}
+      <span class="text-lightteal/70 hidden sm:inline">|</span>
+      <span class="hidden sm:inline text-slate-300">{{ current_user.full_name }}</span>
+      <a href="{{ url_for('auth.logout') }}"
+         class="bg-teal hover:bg-teal/80 px-3 py-1 rounded text-white">Sign out</a>
+    </nav>
+  </div>
+</header>
+{% endif %}
+
+<main class="flex-1">
+  <div class="max-w-6xl mx-auto px-4 py-6">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        {% set color = {'success':'bg-green-100 text-green-800 border-green-300',
+                        'danger':'bg-red-100 text-red-800 border-red-300',
+                        'warning':'bg-amber-100 text-amber-800 border-amber-300'}.get(category,
+                        'bg-slate-100 text-slate-700 border-slate-300') %}
+        <div class="border {{ color }} px-4 py-2 rounded mb-3 text-sm">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<footer class="border-t border-slate-200 bg-white">
+  <div class="max-w-6xl mx-auto px-4 py-3 text-xs text-slate-500 flex justify-between">
+    <span>TrustLed AI Ltd · Aula — the governed AI platform for universities</span>
+    <span>Assess. Automate. Advance.</span>
+  </div>
+</footer>
+</body>
+</html>

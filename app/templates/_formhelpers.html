@@ -1,0 +1,15 @@
+{% macro page_header(title, subtitle) %}
+<div class="mb-5">
+  <h1 class="text-2xl font-bold text-navy">{{ title }}</h1>
+  {% if subtitle %}<p class="text-slate-500 text-sm mt-1">{{ subtitle }}</p>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro result_block(result) %}
+{% if result %}
+<div class="mt-6 bg-white border border-slate-200 rounded-xl p-5">
+  <div class="text-xs uppercase tracking-wide text-teal font-semibold mb-2">Result</div>
+  <div class="prose-out text-sm text-slate-700">{{ result }}</div>
+</div>
+{% endif %}
+{% endmacro %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import page_header %}
+{% block title %}My Teaching — Aula{% endblock %}
+{% block content %}
+{{ page_header("My Teaching", "Your saved lesson plans and lecture notes.") }}
+<div class="flex gap-3 mb-5">
+  <a href="{{ url_for('lecturer.new_plan') }}" class="bg-navy text-white px-4 py-2 rounded text-sm">New lesson plan</a>
+  <a href="{{ url_for('lecturer.new_note') }}" class="bg-teal text-white px-4 py-2 rounded text-sm">New lecture note</a>
+</div>
+
+<h2 class="font-semibold text-navy mb-2">Lesson plans</h2>
+{% if plans %}
+  <div class="space-y-3 mb-6">
+  {% for p in plans %}
+    <details class="bg-white border border-slate-200 rounded-lg p-4">
+      <summary class="cursor-pointer font-medium text-slate-700">{{ p.title }}
+        <span class="text-xs text-slate-400">· {{ p.created_at.strftime('%d %b %Y') }}</span></summary>
+      <div class="prose-out text-sm text-slate-600 mt-3">{{ p.content }}</div>
+    </details>
+  {% endfor %}
+  </div>
+{% else %}<p class="text-sm text-slate-400 mb-6">No saved plans yet.</p>{% endif %}
+
+<h2 class="font-semibold text-navy mb-2">Lecture notes</h2>
+{% if notes %}
+  <div class="space-y-3">
+  {% for n in notes %}
+    <details class="bg-white border border-slate-200 rounded-lg p-4">
+      <summary class="cursor-pointer font-medium text-slate-700">{{ n.topic }}
+        <span class="text-xs text-slate-400">· {{ n.created_at.strftime('%d %b %Y') }}</span></summary>
+      <div class="prose-out text-sm text-slate-600 mt-3">{{ n.content }}</div>
+    </details>
+  {% endfor %}
+  </div>
+{% else %}<p class="text-sm text-slate-400">No saved notes yet.</p>{% endif %}
+{% endblock %}

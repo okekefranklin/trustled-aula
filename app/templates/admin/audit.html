@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import page_header %}
+{% block title %}Audit Log — Aula{% endblock %}
+{% block content %}
+{{ page_header("Audit Log", "Every AI interaction, newest first. Showing up to 300 rows.") }}
+
+<form method="GET" class="flex flex-wrap gap-3 mb-4 items-end">
+  <div>
+    <label class="block text-xs text-slate-600 mb-1">Search by email</label>
+    <input name="q" value="{{ q }}" class="border border-slate-300 rounded px-2 py-1.5 text-sm">
+  </div>
+  <div>
+    <label class="block text-xs text-slate-600 mb-1">Role</label>
+    <select name="role" class="border border-slate-300 rounded px-2 py-1.5 text-sm">
+      <option value="">All</option>
+      {% for r in roles %}<option value="{{ r }}" {{ 'selected' if r==role }} class="capitalize">{{ r }}</option>{% endfor %}
+    </select>
+  </div>
+  <button class="bg-navy text-white px-4 py-1.5 rounded text-sm">Filter</button>
+  <a href="{{ url_for('admin.audit_export') }}" class="bg-teal text-white px-4 py-1.5 rounded text-sm">Export CSV</a>
+</form>
+
+<div class="bg-white border border-slate-200 rounded-xl overflow-x-auto">
+  <table class="w-full text-xs">
+    <thead class="bg-slate-50 text-slate-500 uppercase">
+      <tr><th class="text-left px-3 py-2">Time</th><th class="text-left px-3 py-2">User</th>
+      <th class="text-left px-3 py-2">Role</th><th class="text-left px-3 py-2">Feature</th>
+      <th class="text-left px-3 py-2">Model</th><th class="text-right px-3 py-2">Tokens</th>
+      <th class="text-left px-3 py-2">Status</th></tr>
+    </thead>
+    <tbody>
+    {% for log in logs %}
+      <tr class="border-t border-slate-100 {{ 'bg-red-50' if log.blocked }}">
+        <td class="px-3 py-2 text-slate-500 whitespace-nowrap">{{ log.created_at.strftime('%d %b %H:%M') }}</td>
+        <td class="px-3 py-2">{{ log.user_email }}</td>
+        <td class="px-3 py-2 capitalize">{{ log.role }}</td>
+        <td class="px-3 py-2">{{ (log.feature or '').replace('_',' ') }}</td>
+        <td class="px-3 py-2 text-slate-500">{{ log.model }}</td>
+        <td class="px-3 py-2 text-right">{{ log.prompt_tokens + log.completion_tokens }}</td>
+        <td class="px-3 py-2">{% if log.blocked %}<span class="text-red-600">blocked</span>{% else %}<span class="text-green-600">ok</span>{% endif %}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7" class="px-3 py-6 text-center text-slate-400">No log entries match.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

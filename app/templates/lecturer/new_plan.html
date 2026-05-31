@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import page_header, result_block %}
+{% block title %}New Lesson Plan — Aula{% endblock %}
+{% block content %}
+{{ page_header("Lesson Planner", "Build a semester-aligned plan with objectives, timing, and activities.") }}
+<form method="POST" class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 max-w-2xl">
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Module</label>
+    <input name="module" value="{{ form.module or '' }}" required
+           class="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-teal focus:outline-none"
+           placeholder="e.g. Introduction to Databases">
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Topics to cover</label>
+    <textarea name="topics" rows="3" required
+              class="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-teal focus:outline-none">{{ form.topics or '' }}</textarea>
+  </div>
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Weeks in semester</label>
+      <input name="weeks" value="{{ form.weeks or '' }}" required
+             class="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-teal focus:outline-none"
+             placeholder="e.g. 12">
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Session length</label>
+      <input name="session_length" value="{{ form.session_length or '' }}" required
+             class="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-teal focus:outline-none"
+             placeholder="e.g. 2 hours">
+    </div>
+  </div>
+  <div class="flex gap-3">
+    <button name="generate" value="1" class="bg-navy hover:bg-navy/90 text-white px-5 py-2 rounded font-medium">Generate plan</button>
+    {% if result %}<button name="save" value="1" class="bg-teal hover:bg-teal/80 text-white px-5 py-2 rounded font-medium">Save plan</button>{% endif %}
+  </div>
+</form>
+{{ result_block(result) }}
+{% endblock %}

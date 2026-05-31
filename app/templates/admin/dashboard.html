@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import page_header %}
+{% block title %}Governance Dashboard — Aula{% endblock %}
+{% block content %}
+{{ page_header("Governance Dashboard", "AI use across your institution, at a glance.") }}
+
+<div class="grid sm:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white border border-slate-200 rounded-xl p-4">
+    <div class="text-2xl font-bold text-navy">{{ total_calls }}</div>
+    <div class="text-xs text-slate-500 mt-1">AI interactions logged</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl p-4">
+    <div class="text-2xl font-bold text-navy">{{ user_count }}</div>
+    <div class="text-xs text-slate-500 mt-1">User accounts</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl p-4">
+    <div class="text-2xl font-bold text-navy">{{ by_feature|length }}</div>
+    <div class="text-xs text-slate-500 mt-1">Features in use</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl p-4">
+    <div class="text-2xl font-bold {{ 'text-red-600' if blocked else 'text-navy' }}">{{ blocked }}</div>
+    <div class="text-xs text-slate-500 mt-1">Blocked / failed</div>
+  </div>
+</div>
+
+<div class="grid sm:grid-cols-2 gap-6">
+  <div class="bg-white border border-slate-200 rounded-xl p-5">
+    <h3 class="font-semibold text-navy mb-3">Usage by feature</h3>
+    {% for feature, count in by_feature %}
+      <div class="flex justify-between text-sm py-1 border-b border-slate-100 last:border-0">
+        <span class="text-slate-600">{{ (feature or 'unknown').replace('_',' ') }}</span>
+        <span class="font-medium text-navy">{{ count }}</span>
+      </div>
+    {% else %}<p class="text-sm text-slate-400">No activity yet.</p>{% endfor %}
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl p-5">
+    <h3 class="font-semibold text-navy mb-3">Usage by role</h3>
+    {% for role, count in by_role %}
+      <div class="flex justify-between text-sm py-1 border-b border-slate-100 last:border-0">
+        <span class="text-slate-600 capitalize">{{ role }}</span>
+        <span class="font-medium text-navy">{{ count }}</span>
+      </div>
+    {% else %}<p class="text-sm text-slate-400">No activity yet.</p>{% endfor %}
+  </div>
+</div>
+
+<div class="mt-6 flex gap-3">
+  <a href="{{ url_for('admin.audit') }}" class="bg-navy text-white px-4 py-2 rounded text-sm">View audit log</a>
+  <a href="{{ url_for('admin.audit_export') }}" class="bg-teal text-white px-4 py-2 rounded text-sm">Export CSV</a>
+  <a href="{{ url_for('admin.settings') }}" class="border border-slate-300 text-slate-700 px-4 py-2 rounded text-sm">Settings</a>
+</div>
+{% endblock %}

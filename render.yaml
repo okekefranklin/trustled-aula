@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: trustled-aula
+    runtime: python
+    buildCommand: "pip install -r requirements.txt && python init_db.py"
+    startCommand: "gunicorn wsgi:app"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: LLM_PROVIDER
+        value: anthropic
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        value: claude-3-5-sonnet-20241022

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import page_header %}
+{% block title %}My Work — Aula{% endblock %}
+{% block content %}
+{{ page_header("My Work", "Your saved research support and revision material.") }}
+<div class="flex gap-3 mb-5">
+  <a href="{{ url_for('student.new_research') }}" class="bg-navy text-white px-4 py-2 rounded text-sm">Research support</a>
+  <a href="{{ url_for('student.new_exam') }}" class="bg-teal text-white px-4 py-2 rounded text-sm">Exam prep</a>
+</div>
+{% if docs %}
+  <div class="space-y-3">
+  {% for d in docs %}
+    <details class="bg-white border border-slate-200 rounded-lg p-4">
+      <summary class="cursor-pointer font-medium text-slate-700">{{ d.title }}
+        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded ml-1">{{ d.kind.replace('_',' ') }}</span>
+        <span class="text-xs text-slate-400">· {{ d.created_at.strftime('%d %b %Y') }}</span></summary>
+      <div class="prose-out text-sm text-slate-600 mt-3">{{ d.content }}</div>
+    </details>
+  {% endfor %}
+  </div>
+{% else %}<p class="text-sm text-slate-400">Nothing saved yet.</p>{% endif %}
+{% endblock %}
