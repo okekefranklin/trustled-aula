@@ -26,7 +26,7 @@
       <tr><th class="text-left px-3 py-2">Time</th><th class="text-left px-3 py-2">User</th>
       <th class="text-left px-3 py-2">Role</th><th class="text-left px-3 py-2">Feature</th>
       <th class="text-left px-3 py-2">Model</th><th class="text-right px-3 py-2">Tokens</th>
-      <th class="text-left px-3 py-2">Status</th></tr>
+      <th class="text-left px-3 py-2">Status</th><th class="text-left px-3 py-2">Note</th></tr>
     </thead>
     <tbody>
     {% for log in logs %}
@@ -38,9 +38,10 @@
         <td class="px-3 py-2 text-slate-500">{{ log.model }}</td>
         <td class="px-3 py-2 text-right">{{ log.prompt_tokens + log.completion_tokens }}</td>
         <td class="px-3 py-2">{% if log.blocked %}<span class="text-red-600">blocked</span>{% else %}<span class="text-green-600">ok</span>{% endif %}</td>
+        <td class="px-3 py-2 text-slate-600 max-w-xs">{{ log.note or '—' }}</td>
       </tr>
     {% else %}
-      <tr><td colspan="7" class="px-3 py-6 text-center text-slate-400">No log entries match.</td></tr>
+      <tr><td colspan="8" class="px-3 py-6 text-center text-slate-400">No log entries match.</td></tr>
     {% endfor %}
     </tbody>
   </table>
