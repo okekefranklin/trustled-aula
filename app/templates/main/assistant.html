@@ -1,9 +1,17 @@
 {% extends "base.html" %}
-{% from "_formhelpers.html" import page_header, result_block %}
+{% from "_formhelpers.html" import page_header, result_block, research_sources_banner %}
 {% block title %}Research Assistant — Aula{% endblock %}
 {% block content %}
 {{ page_header("Research Assistant",
    "Generate research and project ideas from your interests. References use your institution's " ~ style ~ " style.") }}
+{% if request.method == 'POST' %}
+  {{ research_sources_banner(
+       used_research_api,
+       papers,
+       research_source,
+       none if used_research_api else "All scholarly search sources (OpenAlex, Semantic Scholar, and CrossRef) were unavailable or returned no results. References in the result are illustrative only and must be verified independently before use."
+     ) }}
+{% endif %}
 <form method="POST" class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 max-w-2xl">
   <div>
     <label class="block text-sm font-medium text-slate-700 mb-1">Your field or discipline</label>

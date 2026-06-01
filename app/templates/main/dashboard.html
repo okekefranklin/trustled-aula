@@ -4,7 +4,11 @@
 <div class="mb-6">
   <h1 class="text-2xl font-bold text-navy">Welcome, {{ current_user.full_name.split()[0] }}</h1>
   <p class="text-slate-500 text-sm mt-1">
-    Every tool here runs through your institution's sanctioned, governed AI environment.
+    {% if current_user.is_admin %}
+      Manage governance, user access, and institution settings for Aula.
+    {% else %}
+      Every tool here runs through your institution's sanctioned, governed AI environment.
+    {% endif %}
   </p>
 </div>
 
@@ -19,8 +23,10 @@
 {% endmacro %}
 
 <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-  {{ card("Research Assistant", "Develop research and project ideas from your interests, with references in your house style.", url_for('main.assistant')) }}
-  {{ card("Reference Formatter", "Turn raw source details into a clean reference list in your institution's style.", url_for('main.references')) }}
+  {% if not current_user.is_admin %}
+    {{ card("Research Assistant", "Develop research and project ideas from your interests, with references in your house style.", url_for('main.assistant')) }}
+    {{ card("Reference Formatter", "Turn raw source details into a clean reference list in your institution's style.", url_for('main.references')) }}
+  {% endif %}
 
   {% if current_user.is_lecturer %}
     {{ card("Lesson Planner", "Build a semester-aligned plan with objectives, timing, and activities.", url_for('lecturer.new_plan')) }}
@@ -38,6 +44,8 @@
     {{ card("Governance Dashboard", "Usage by feature, role, and volume across the institution.", url_for('admin.dashboard')) }}
     {{ card("Audit Log", "Every AI interaction, searchable and exportable.", url_for('admin.audit')) }}
     {{ card("User Accounts", "Create and manage staff and student access.", url_for('admin.users')) }}
+    {{ card("Policy Consent", "Who accepted the current AI and privacy policies.", url_for('admin.consent_records')) }}
+    {{ card("Institution Settings", "Referencing style, policy texts, and policy version.", url_for('admin.settings')) }}
   {% endif %}
 </div>
 {% endblock %}

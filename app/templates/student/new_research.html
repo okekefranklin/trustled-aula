@@ -1,9 +1,17 @@
 {% extends "base.html" %}
-{% from "_formhelpers.html" import page_header, result_block %}
+{% from "_formhelpers.html" import page_header, result_block, research_sources_banner %}
 {% block title %}Research Support — Aula{% endblock %}
 {% block content %}
 {{ page_header("Research Support",
    "Guidance for your project or paper. References use your institution's " ~ style ~ " style.") }}
+{% if request.method == 'POST' %}
+  {{ research_sources_banner(
+       used_research_api,
+       papers,
+       research_source,
+       none if used_research_api else "All scholarly search sources (OpenAlex, Semantic Scholar, and CrossRef) were unavailable or returned no results. References in the result are illustrative only and must be verified independently before use."
+     ) }}
+{% endif %}
 <form method="POST" class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 max-w-2xl">
   <div>
     <label class="block text-sm font-medium text-slate-700 mb-1">Course</label>
@@ -18,9 +26,9 @@
   <div>
     <label class="block text-sm font-medium text-slate-700 mb-1">Where are you?</label>
     <select name="stage" class="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-teal focus:outline-none">
-      <option value="ideas">Looking for ideas</option>
-      <option value="outlining">Outlining</option>
-      <option value="drafting">Drafting</option>
+      <option value="ideas" {{ 'selected' if (form.stage|default('ideas')) == 'ideas' }}>Looking for ideas</option>
+      <option value="outlining" {{ 'selected' if form.stage == 'outlining' }}>Outlining</option>
+      <option value="drafting" {{ 'selected' if form.stage == 'drafting' }}>Drafting</option>
     </select>
   </div>
   <div class="flex gap-3">

@@ -8,6 +8,8 @@ Re-running is safe: it will not duplicate accounts that already exist.
 from app import create_app
 from app.extensions import db
 from app.models import Institution, User, ROLE_ADMIN, ROLE_LECTURER, ROLE_STUDENT
+from app.policies import (DEFAULT_ACCEPTABLE_USE, DEFAULT_POLICY_VERSION,
+                          DEFAULT_PRIVACY_NOTICE)
 
 app = create_app()
 
@@ -22,7 +24,13 @@ with app.app_context():
 
     inst = Institution.query.first()
     if not inst:
-        inst = Institution(name="Demo University", referencing_style="APA")
+        inst = Institution(
+            name="Demo University",
+            referencing_style="APA",
+            policy_version=DEFAULT_POLICY_VERSION,
+            acceptable_use_policy=DEFAULT_ACCEPTABLE_USE,
+            data_privacy_notice=DEFAULT_PRIVACY_NOTICE,
+        )
         db.session.add(inst)
         db.session.commit()
         print(f"Created institution: {inst.name}")

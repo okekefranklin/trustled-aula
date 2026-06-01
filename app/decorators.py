@@ -29,3 +29,4 @@ def role_required(*roles):
 admin_required = role_required(ROLE_ADMIN)
 lecturer_required = role_required(ROLE_LECTURER)
 student_required = role_required(ROLE_STUDENT)
+staff_required = role_required(ROLE_LECTURER, ROLE_STUDENT)

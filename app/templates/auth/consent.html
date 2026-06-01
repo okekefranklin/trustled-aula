@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import page_header %}
+{% block title %}Policy Consent — Aula{% endblock %}
+{% block content %}
+{{ page_header("Before you continue", "Please read and accept your institution's policies to use Aula.") }}
+
+<form method="POST" class="space-y-5 max-w-3xl">
+  <div class="bg-white border border-slate-200 rounded-xl p-5">
+    <h2 class="font-semibold text-navy mb-2">AI Acceptable Use Policy</h2>
+    <p class="text-xs text-slate-400 mb-3">Version {{ inst.policy_version if inst else '1.0' }}</p>
+    <div class="prose-out text-sm text-slate-600 bg-slate-50 rounded-lg p-4 max-h-64 overflow-y-auto border border-slate-100">
+      {{ (inst.acceptable_use_policy if inst else '') or 'Policy text not configured.' }}
+    </div>
+    <label class="flex items-start gap-2 mt-4 text-sm text-slate-700 cursor-pointer">
+      <input type="checkbox" name="accept_aup" value="1" required class="mt-1 accent-teal">
+      <span>I have read and accept the AI Acceptable Use Policy.</span>
+    </label>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-xl p-5">
+    <h2 class="font-semibold text-navy mb-2">Data Privacy and Processing Notice</h2>
+    <p class="text-xs text-slate-400 mb-3">Version {{ inst.policy_version if inst else '1.0' }}</p>
+    <div class="prose-out text-sm text-slate-600 bg-slate-50 rounded-lg p-4 max-h-64 overflow-y-auto border border-slate-100">
+      {{ (inst.data_privacy_notice if inst else '') or 'Notice text not configured.' }}
+    </div>
+    <label class="flex items-start gap-2 mt-4 text-sm text-slate-700 cursor-pointer">
+      <input type="checkbox" name="accept_privacy" value="1" required class="mt-1 accent-teal">
+      <span>I have read and accept the Data Privacy and Processing Notice.</span>
+    </label>
+  </div>
+
+  <button type="submit" class="bg-navy hover:bg-navy/90 text-white px-6 py-2.5 rounded font-medium">
+    I agree — continue to Aula
+  </button>
+</form>
+{% endblock %}

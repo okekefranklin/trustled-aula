@@ -5,6 +5,42 @@
 </div>
 {% endmacro %}
 
+{% macro quota_banner(quota) %}
+<div class="bg-navy text-white rounded-xl px-4 py-3 mb-5 text-sm flex flex-wrap items-center gap-x-6 gap-y-1">
+  <span><span class="text-lightteal font-medium">Tokens used:</span> {{ "{:,}".format(quota.used) }}</span>
+  <span><span class="text-lightteal font-medium">Remaining:</span> {{ "{:,}".format(quota.remaining) }}</span>
+  <span><span class="text-lightteal font-medium">Quota:</span> {{ "{:,}".format(quota.quota) }}</span>
+  <span><span class="text-lightteal font-medium">Resets:</span> {{ quota.reset_date.strftime('%d %b %Y') }}</span>
+  {% if quota.over_quota %}
+    <span class="text-amber-300 font-medium">Quota reached — AI requests are blocked until reset.</span>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro research_sources_banner(used_research_api, papers, research_source, unavailable_message) %}
+{% if used_research_api and papers %}
+<div class="bg-teal/10 border border-teal/30 text-navy rounded-lg px-4 py-3 mb-4 text-sm">
+  <p class="font-medium text-teal mb-2">
+    Real retrieved sources ({{ research_source }}) — click to verify originals:
+  </p>
+  <ul class="space-y-2">
+  {% for p in papers %}
+    <li>
+      <a href="{{ p.verification_url or p.url }}" target="_blank" rel="noopener"
+         class="text-navy font-medium hover:text-teal underline">{{ p.title }}</a>
+      <span class="text-slate-500"> — {{ p.authors }} ({{ p.year }})</span>
+      <span class="text-xs bg-lightteal/40 text-teal px-1.5 py-0.5 rounded ml-1">REAL</span>
+    </li>
+  {% endfor %}
+  </ul>
+</div>
+{% elif unavailable_message %}
+<div class="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded mb-4 text-sm">
+  {{ unavailable_message }}
+</div>
+{% endif %}
+{% endmacro %}
+
 {% macro result_block(result) %}
 {% if result %}
 <div class="mt-6 bg-white border border-slate-200 rounded-xl p-5">

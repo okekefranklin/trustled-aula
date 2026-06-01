@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import page_header %}
+{% block title %}Policy Consent Records — Aula{% endblock %}
+{% block content %}
+{{ page_header("Policy Consent Records",
+   "Governance evidence: who accepted the current policies and when.") }}
+
+<div class="grid sm:grid-cols-3 gap-4 mb-6">
+  <div class="bg-white border border-slate-200 rounded-xl p-4">
+    <div class="text-2xl font-bold text-navy">{{ accepted_count }}/{{ user_count }}</div>
+    <div class="text-xs text-slate-500 mt-1">Users compliant with v{{ required_version }}</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl p-4 sm:col-span-2">
+    <div class="text-sm text-slate-600">
+      Current required policy version: <span class="font-semibold text-navy">{{ required_version }}</span>.
+      Update policy text or version in
+      <a href="{{ url_for('admin.settings') }}" class="text-teal hover:underline">Institution Settings</a>.
+    </div>
+  </div>
+</div>
+
+<div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+      <tr>
+        <th class="text-left px-4 py-2">Name</th>
+        <th class="text-left px-4 py-2">Email</th>
+        <th class="text-left px-4 py-2">Role</th>
+        <th class="text-left px-4 py-2">Accepted at</th>
+        <th class="text-left px-4 py-2">Version</th>
+        <th class="text-left px-4 py-2">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for r in records %}
+      <tr class="border-t border-slate-100">
+        <td class="px-4 py-2">{{ r.user.full_name }}</td>
+        <td class="px-4 py-2 text-slate-500">{{ r.user.email }}</td>
+        <td class="px-4 py-2 capitalize">{{ r.user.role }}</td>
+        <td class="px-4 py-2 text-slate-500">
+          {{ r.accepted_at.strftime('%d %b %Y %H:%M') if r.accepted_at else '—' }}
+        </td>
+        <td class="px-4 py-2">{{ r.accepted_version or '—' }}</td>
+        <td class="px-4 py-2">
+          {% if r.compliant %}
+            <span class="text-green-600">Compliant</span>
+          {% else %}
+            <span class="text-amber-600">Pending</span>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

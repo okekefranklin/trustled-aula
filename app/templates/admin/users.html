@@ -32,6 +32,7 @@
     <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
       <tr><th class="text-left px-4 py-2">Name</th><th class="text-left px-4 py-2">Email</th>
       <th class="text-left px-4 py-2">Role</th><th class="text-left px-4 py-2">Status</th>
+      <th class="text-left px-4 py-2">Token quota</th>
       <th class="text-right px-4 py-2">Action</th></tr>
     </thead>
     <tbody>
@@ -43,6 +44,18 @@
         <td class="px-4 py-2">
           {% if u.is_active_user %}<span class="text-green-600">Active</span>
           {% else %}<span class="text-slate-400">Inactive</span>{% endif %}
+        </td>
+        <td class="px-4 py-2">
+          <form method="POST" action="{{ url_for('admin.set_quota', user_id=u.id) }}"
+                class="flex items-center gap-2">
+            <span class="text-xs text-slate-400 whitespace-nowrap">
+              {{ "{:,}".format(usage.get(u.id, 0)) }} used
+            </span>
+            <input name="token_quota" type="number" min="0" step="1000"
+                   value="{{ u.token_quota or 100000 }}"
+                   class="w-28 border border-slate-300 rounded px-2 py-1 text-xs">
+            <button class="text-xs bg-teal text-white px-2 py-1 rounded hover:bg-teal/80">Set</button>
+          </form>
         </td>
         <td class="px-4 py-2 text-right">
           {% if u.id != current_user.id %}

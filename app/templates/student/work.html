@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% from "_formhelpers.html" import page_header %}
+{% from "_formhelpers.html" import page_header, quota_banner %}
 {% block title %}My Work — Aula{% endblock %}
 {% block content %}
 {{ page_header("My Work", "Your saved research support and revision material.") }}
+{{ quota_banner(quota) }}
 <div class="flex gap-3 mb-5">
   <a href="{{ url_for('student.new_research') }}" class="bg-navy text-white px-4 py-2 rounded text-sm">Research support</a>
   <a href="{{ url_for('student.new_exam') }}" class="bg-teal text-white px-4 py-2 rounded text-sm">Exam prep</a>

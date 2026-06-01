@@ -11,6 +11,7 @@ from sqlalchemy import func
 
 from ..decorators import admin_required
 from ..extensions import db
+from ..quota import quota_status, tokens_used
 from ..models import (User, AuditLog, Institution, ROLES, ROLE_ADMIN,
                       ROLE_LECTURER, ROLE_STUDENT)
 
@@ -41,7 +42,26 @@ def dashboard():
 @admin_required
 def users():
     items = User.query.order_by(User.created_at.desc()).all()
-    return render_template("admin/users.html", users=items, roles=ROLES)
+    usage = {u.id: tokens_used(u) for u in items}
+    return render_template("admin/users.html", users=items, roles=ROLES, usage=usage)
+
+
+@admin_bp.route("/users/<int:user_id>/quota", methods=["POST"])
+@login_required
+@admin_required
+def set_quota(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        flash("User not found.", "danger")
+        return redirect(url_for("admin.users"))
+    token_quota = request.form.get("token_quota", type=int)
+    if token_quota is None or token_quota < 0:
+        flash("Enter a valid non-negative token quota.", "danger")
+        return redirect(url_for("admin.users"))
+    user.token_quota = token_quota
+    db.session.commit()
+    flash(f"Token quota for {user.email} set to {token_quota:,}.", "success")
+    return redirect(url_for("admin.users"))
 
 
 @admin_bp.route("/users/new", methods=["POST"])
@@ -119,6 +139,29 @@ def audit_export():
                     headers={"Content-Disposition": f"attachment; filename={filename}"})
 
 
+@admin_bp.route("/consent")
+@login_required
+@admin_required
+def consent_records():
+    """Governance evidence: who accepted which policy version and when."""
+    inst = Institution.query.first()
+    required = inst.policy_version if inst else "1.0"
+    users = User.query.order_by(User.full_name).all()
+    records = []
+    for u in users:
+        compliant = u.has_accepted_current_policy()
+        records.append({
+            "user": u,
+            "compliant": compliant,
+            "accepted_at": u.accepted_policies_at,
+            "accepted_version": u.policy_version,
+        })
+    accepted_count = sum(1 for r in records if r["compliant"])
+    return render_template("admin/consent.html", records=records, inst=inst,
+                           required_version=required, accepted_count=accepted_count,
+                           user_count=len(records))
+
+
 @admin_bp.route("/settings", methods=["GET", "POST"])
 @login_required
 @admin_required
@@ -128,7 +171,21 @@ def settings():
         inst.name = request.form.get("name", inst.name).strip()
         inst.referencing_style = request.form.get("referencing_style",
                                                    inst.referencing_style).strip()
+        inst.acceptable_use_policy = request.form.get(
+            "acceptable_use_policy", inst.acceptable_use_policy or "").strip()
+        inst.data_privacy_notice = request.form.get(
+            "data_privacy_notice", inst.data_privacy_notice or "").strip()
+        new_version = request.form.get("policy_version", inst.policy_version).strip()
+        version_changed = bool(new_version and new_version != inst.policy_version)
+        if version_changed:
+            inst.policy_version = new_version
         db.session.commit()
-        flash("Institution settings updated.", "success")
+        if version_changed:
+            flash(
+                f"Policy version updated to {new_version}. Users must re-accept to continue.",
+                "warning",
+            )
+        else:
+            flash("Institution settings updated.", "success")
         return redirect(url_for("admin.settings"))
     return render_template("admin/settings.html", inst=inst)

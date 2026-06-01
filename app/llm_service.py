@@ -23,6 +23,7 @@ from flask_login import current_user
 
 from .extensions import db
 from .models import AuditLog
+from .quota import is_over_quota, quota_status
 
 
 def _log(feature, prompt, model, p_tokens=0, c_tokens=0, blocked=False, note=None):
@@ -63,10 +64,13 @@ def _call_anthropic(system, prompt, model, api_key):
     return text, usage.input_tokens, usage.output_tokens
 
 
-def _call_openai(system, prompt, model, api_key):
+def _call_openai(system, prompt, model, api_key, base_url=None):
     from openai import OpenAI
 
-    client = OpenAI(api_key=api_key)
+    client_kwargs = {"api_key": api_key}
+    if base_url:
+        client_kwargs["base_url"] = base_url
+    client = OpenAI(**client_kwargs)
     resp = client.chat.completions.create(
         model=model,
         max_tokens=2000,
@@ -91,6 +95,19 @@ def generate(feature, prompt, system="You are a helpful academic assistant."):
     model = cfg.get("LLM_MODEL", "")
     api_key = cfg.get("LLM_API_KEY", "")
 
+    if is_over_quota(current_user):
+        status = quota_status(current_user)
+        note = (
+            f"Quota exceeded: {status['used']:,}/{status['quota']:,} tokens used "
+            f"this period (resets {status['reset_date'].strftime('%d %b %Y')})"
+        )
+        _log(feature, prompt, model=model or "n/a", blocked=True, note=note)
+        return (
+            "You have reached your AI token quota for this period. "
+            f"Your allowance resets on {status['reset_date'].strftime('%d %B %Y')}. "
+            "Please contact your administrator if you need more."
+        )
+
     # Stub mode: no key configured. Still logs, so governance can be demonstrated.
     if not api_key:
         _log(feature, prompt, model="stub", note="No API key configured")
@@ -103,7 +120,10 @@ def generate(feature, prompt, system="You are a helpful academic assistant."):
 
     try:
         if provider == "openai":
-            text, p_tok, c_tok = _call_openai(system, prompt, model, api_key)
+            base_url = cfg.get("LLM_BASE_URL") or None
+            text, p_tok, c_tok = _call_openai(
+                system, prompt, model, api_key, base_url=base_url
+            )
         else:
             text, p_tok, c_tok = _call_anthropic(system, prompt, model, api_key)
         _log(feature, prompt, model=model, p_tokens=p_tok, c_tokens=c_tok)

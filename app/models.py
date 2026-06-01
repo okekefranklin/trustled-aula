@@ -9,12 +9,13 @@ Four core tables:
   - Artefact tables (LessonPlan, LectureNote, StudentDocument): the saved
     outputs of each feature, tied to the user who created them.
 """
-from datetime import datetime
+from datetime import date, datetime
 
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .extensions import db, login_manager
+from .policies import DEFAULT_POLICY_VERSION
 
 # Role constants
 ROLE_ADMIN = "admin"
@@ -30,6 +31,9 @@ class Institution(db.Model):
     name = db.Column(db.String(200), nullable=False)
     # The house referencing style applied across all features by default.
     referencing_style = db.Column(db.String(50), default="APA", nullable=False)
+    policy_version = db.Column(db.String(20), default=DEFAULT_POLICY_VERSION, nullable=False)
+    acceptable_use_policy = db.Column(db.Text)
+    data_privacy_notice = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     users = db.relationship("User", backref="institution", lazy=True)
@@ -51,7 +55,23 @@ class User(UserMixin, db.Model):
 
     institution_id = db.Column(db.Integer, db.ForeignKey("institutions.id"))
 
+    token_quota = db.Column(db.Integer, default=100000, nullable=False)
+    quota_period_start = db.Column(db.Date, default=lambda: date.today().replace(day=1))
+
+    accepted_policies_at = db.Column(db.DateTime, nullable=True)
+    policy_version = db.Column(db.String(20), nullable=True)
+
     # Helpers
+    def has_accepted_current_policy(self):
+        """True if the user accepted the institution's current policy version."""
+        inst = self.institution
+        if not inst:
+            return self.accepted_policies_at is not None
+        required = inst.policy_version or DEFAULT_POLICY_VERSION
+        return (
+            self.accepted_policies_at is not None
+            and self.policy_version == required
+        )
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 

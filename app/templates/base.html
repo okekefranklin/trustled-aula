@@ -26,8 +26,10 @@
     </a>
     <nav class="flex items-center gap-4 text-sm">
       <a href="{{ url_for('main.dashboard') }}" class="hover:text-lightteal">Home</a>
-      <a href="{{ url_for('main.assistant') }}" class="hover:text-lightteal">Research Assistant</a>
-      <a href="{{ url_for('main.references') }}" class="hover:text-lightteal">References</a>
+      {% if not current_user.is_admin %}
+        <a href="{{ url_for('main.assistant') }}" class="hover:text-lightteal">Research Assistant</a>
+        <a href="{{ url_for('main.references') }}" class="hover:text-lightteal">References</a>
+      {% endif %}
       {% if current_user.is_lecturer %}
         <a href="{{ url_for('lecturer.plans') }}" class="hover:text-lightteal">My Teaching</a>
       {% endif %}
@@ -35,7 +37,11 @@
         <a href="{{ url_for('student.work') }}" class="hover:text-lightteal">My Work</a>
       {% endif %}
       {% if current_user.is_admin %}
-        <a href="{{ url_for('admin.dashboard') }}" class="hover:text-lightteal">Admin</a>
+        <a href="{{ url_for('admin.dashboard') }}" class="hover:text-lightteal">Governance</a>
+        <a href="{{ url_for('admin.audit') }}" class="hover:text-lightteal">Audit Log</a>
+        <a href="{{ url_for('admin.users') }}" class="hover:text-lightteal">Users</a>
+        <a href="{{ url_for('admin.consent_records') }}" class="hover:text-lightteal">Consent</a>
+        <a href="{{ url_for('admin.settings') }}" class="hover:text-lightteal">Settings</a>
       {% endif %}
       <span class="text-lightteal/70 hidden sm:inline">|</span>
       <span class="hidden sm:inline text-slate-300">{{ current_user.full_name }}</span>

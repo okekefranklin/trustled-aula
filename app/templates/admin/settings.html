@@ -2,8 +2,8 @@
 {% from "_formhelpers.html" import page_header %}
 {% block title %}Settings — Aula{% endblock %}
 {% block content %}
-{{ page_header("Institution Settings", "The referencing style here is applied across every feature.") }}
-<form method="POST" class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 max-w-xl">
+{{ page_header("Institution Settings", "Referencing style and policy texts applied across Aula.") }}
+<form method="POST" class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 max-w-3xl">
   <div>
     <label class="block text-sm font-medium text-slate-700 mb-1">Institution name</label>
     <input name="name" value="{{ inst.name if inst }}"
@@ -18,6 +18,26 @@
       {% endfor %}
     </select>
   </div>
+
+  <hr class="border-slate-200">
+
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Policy version</label>
+    <input name="policy_version" value="{{ inst.policy_version if inst else '1.0' }}"
+           class="w-32 border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-teal focus:outline-none">
+    <p class="text-xs text-slate-400 mt-1">Changing this requires all users to re-accept policies at next login.</p>
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">AI Acceptable Use Policy</label>
+    <textarea name="acceptable_use_policy" rows="10"
+              class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-teal focus:outline-none">{{ inst.acceptable_use_policy if inst else '' }}</textarea>
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Data Privacy and Processing Notice</label>
+    <textarea name="data_privacy_notice" rows="10"
+              class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-teal focus:outline-none">{{ inst.data_privacy_notice if inst else '' }}</textarea>
+  </div>
+
   <button class="bg-navy text-white px-5 py-2 rounded font-medium">Save settings</button>
 </form>
 {% endblock %}
