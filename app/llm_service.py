@@ -67,10 +67,10 @@ def _call_anthropic(system, prompt, model, api_key):
 def _call_openai(system, prompt, model, api_key, base_url=None):
     from openai import OpenAI
 
-    client_kwargs = {"api_key": api_key}
     if base_url:
-        client_kwargs["base_url"] = base_url
-    client = OpenAI(**client_kwargs)
+        client = OpenAI(api_key=api_key, base_url=base_url)
+    else:
+        client = OpenAI(api_key=api_key)
     resp = client.chat.completions.create(
         model=model,
         max_tokens=2000,
